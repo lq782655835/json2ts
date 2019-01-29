@@ -2,7 +2,7 @@
 
 const yargs = require('yargs')
 const chalk = require('chalk')
-const run = require('./src/entry')
+const run = require('./src/json2ts')
 
 const args = yargs
 .usage('Usage: $0 [options]')
@@ -11,6 +11,12 @@ const args = yargs
 .default('t', './interface')
 .describe('u', "your web url")
 .alias('u', 'url')
+.describe('m', 'your web url method')
+.alias('m', 'method')
+.default('m', 'get')
+.describe('p', 'export response property interface')
+.alias('p', 'property')
+// .default('p', 'data')
 .demandOption(['url'])
 .help('help')
 .alias('h', 'help').argv
