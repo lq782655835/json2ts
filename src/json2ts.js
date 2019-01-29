@@ -3,7 +3,7 @@ const fs = require('fs-extra')
 const chalk = require('chalk')
 const rp = require('request-promise')
 const cheerio = require('cheerio')
-const outTs = require('./out-ts')
+const exportTSFile = require('./export-tsfile')
 const util = require('../src/util')
 const getInterfaceTitle = util.getInterfaceTitle
 
@@ -27,7 +27,7 @@ const convert = async (options, adapter) => {
 
     let body = await rp({ url, method, json: true })
     if (typeof body === 'object') {
-        outTs(target, body, property, getInterfaceTitle(url))
+        exportTSFile(target, body, property, getInterfaceTitle(url))
     } else {
         // reslove page, get url and method
         let $ = cheerio.load(body)
@@ -73,7 +73,7 @@ const exportInterfaces = (target, jsons, urls, property) => {
     fs.removeSync(target)
 
     jsons.forEach((json, index) =>
-        outTs(target, json, property, getInterfaceTitle(urls[index].url))
+        exportTSFile(target, json, property, getInterfaceTitle(urls[index].url))
     )
 }
 module.exports = convert
