@@ -7,11 +7,12 @@
   },
   "main": "index.js",
   "scripts": {
+    "github": "sh deploy.sh",
     "format": "prettier --write \"./src/**/*.{js,ts,vue,json}\""
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run format"
+      "pre-commit": "npm run format && git add ."
     }
   },
   "keywords": [

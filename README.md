@@ -15,8 +15,6 @@ json2ts --url=your-web-url
 ```
 
 ```
-Usage: index.js --url=url
-
 Options:
   --version   Show version number                                      [boolean]
   --url       your web url                                            [required]
