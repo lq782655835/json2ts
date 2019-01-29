@@ -1,12 +1,27 @@
 const path = require('path')
 const fs = require('fs-extra')
+const chalk = require('chalk')
 const rp = require('request-promise')
 const cheerio = require('cheerio')
 const outTs = require('./out-ts')
 const util = require('../src/util')
 const getInterfaceTitle = util.getInterfaceTitle
 
-const convert = async ({ url, method, target, property }, adapter) => {
+const convert = async (options, adapter) => {
+    let defaults = {
+        url: '',
+        method: 'get',
+        target: './interface',
+        property: ''
+    }
+    options = { ...defaults, ...options }
+    if (!options.url) {
+        console.log(chalk.red('url can not be empty'))
+        return
+    }
+
+    let { url, method, target, property } = options
+    url = url.endsWith('/') ? url.substring(0, url.length - 1) : url
     target = path.join(process.cwd(), target)
     let resolvePage = adapter || getAllUrl
 
