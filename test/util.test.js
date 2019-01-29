@@ -1,5 +1,5 @@
-const util = require('../src/util')
-const getInterfaceTitle = util.getInterfaceTitle
+const helper = require('../src/util/helper')
+const getInterfaceTitle = helper.getInterfaceTitle
 
 test('no root path', () => {
     let url = '/view/topic'

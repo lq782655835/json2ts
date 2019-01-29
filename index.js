@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 const yargs = require('yargs')
-const chalk = require('chalk')
 const run = require('./src/json2ts')
+const logger = require('./src/util/logger')
 
 const args = yargs
 .usage('Usage: $0 [options]')
@@ -23,7 +23,7 @@ const args = yargs
     try {
         await run({...args})
     } catch (err) {
-        console.log(chalk.red(err))
+        logger.log('error', {data: [err]})
     }
 })()
 

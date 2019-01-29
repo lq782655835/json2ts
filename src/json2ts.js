@@ -1,11 +1,10 @@
 const path = require('path')
 const fs = require('fs-extra')
-const chalk = require('chalk')
 const rp = require('request-promise')
 const cheerio = require('cheerio')
+const logger = require('./util/logger')
 const exportTSFile = require('./export-tsfile')
-const util = require('../src/util')
-const getInterfaceTitle = util.getInterfaceTitle
+const getInterfaceTitle = require('../src/util/helper').getInterfaceTitle
 
 const convert = async (options, adapter) => {
     let defaults = {
@@ -16,7 +15,7 @@ const convert = async (options, adapter) => {
     }
     options = { ...defaults, ...options }
     if (!options.url) {
-        console.log(chalk.red('url can not be empty'))
+        logger.log('error', { message: 'url can not be empty' })
         return
     }
 
@@ -27,8 +26,12 @@ const convert = async (options, adapter) => {
 
     let body = await rp({ url, method, json: true })
     if (typeof body === 'object') {
+        logger.log('debug', { message: 'single api', data: [{ target, property, url }] })
+
         exportTSFile(target, body, property, getInterfaceTitle(url))
     } else {
+        logger.log('debug', { message: 'resolve page api', data: [{ target, property, url }] })
+
         // reslove page, get url and method
         let $ = cheerio.load(body)
         let urls = resolvePage($)
@@ -71,6 +74,7 @@ const getAllResponseJson = async (root, urls) => {
 const exportInterfaces = (target, jsons, urls, property) => {
     // before remove entire target folder
     fs.removeSync(target)
+    logger.log('debug', { message: `remove target folder: ${target}` })
 
     jsons.forEach((json, index) =>
         exportTSFile(target, json, property, getInterfaceTitle(urls[index].url))
