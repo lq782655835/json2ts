@@ -10,7 +10,7 @@ const convert = async (options, adapter) => {
     let defaults = {
         url: '',
         method: 'get',
-        target: './interface',
+        target: './interfaces',
         property: ''
     }
     options = { ...defaults, ...options }

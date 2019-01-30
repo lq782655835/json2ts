@@ -18,7 +18,7 @@ json2ts -u=your-web-url
 --version       Show version number                                   [boolean]
   -u, --url       your web url                                        [required]
   -m, --method    your web url method                           [default: "get"]
-  -t, --target    typescript interface target folder path       [default: "./interface"]
+  -t, --target    typescript interface target folder path       [default: "./interfaces"]
   -p, --property  export response property interface
   -h, --help      Show help                                           [boolean]
 ```

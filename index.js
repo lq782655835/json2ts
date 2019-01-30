@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+require('./src/util/helper').checkNodeVersion()
+
 const yargs = require('yargs')
 const run = require('./src/json2ts')
 const logger = require('./src/util/logger')

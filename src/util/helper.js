@@ -1,5 +1,6 @@
 const url = require('url')
 const util = require('util')
+const semver = require('semver')
 
 exports.getInterfaceTitle = path => {
     if (path.startsWith('http')) {
@@ -38,4 +39,14 @@ exports.getFormatTime = (format, time) => {
         _doFormat(time.getSeconds()),
         _doFormatMill(time.getMilliseconds())
     )
+}
+
+/**
+ * 检测 Node 版本
+ */
+exports.checkNodeVersion = function() {
+    if (semver.satisfies(process.version, '< 8')) {
+        console.log('请将 Node 更新至 8 及以上版本，可以使用 nvm 在本地安装并管理多个 Node 版本。')
+        process.exit(1)
+    }
 }
