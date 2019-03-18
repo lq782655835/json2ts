@@ -22,23 +22,20 @@ const convert = async (options, adapter) => {
     let { url, method, target, property } = options
     url = url.endsWith('/') ? url.substring(0, url.length - 1) : url
     target = path.join(process.cwd(), target)
-    let resolvePage = adapter || getAllUrl
 
     let body = await rp({ url, method, json: true })
     if (typeof body === 'object') {
         logger.log('debug', { message: 'single api', data: [{ target, property, url }] })
-
         exportTSFile(target, body, property, getInterfaceTitle(url))
     } else {
         logger.log('debug', { message: 'resolve page api', data: [{ target, property, url }] })
-
         // reslove page, get url and method
         let $ = cheerio.load(body)
+        let resolvePage = adapter || getAllUrl
         let urls = resolvePage($)
 
         // get all urls response
         let jsons = await getAllResponseJson(url, urls)
-
         exportInterfaces(target, jsons, urls, property)
     }
 }
@@ -72,7 +69,7 @@ const getAllResponseJson = async (root, urls) => {
 }
 
 const exportInterfaces = (target, jsons, urls, property) => {
-    // before remove entire target folder
+    // remove entire target folder
     fs.removeSync(target)
     logger.log('debug', { message: `remove target folder: ${target}` })
 
