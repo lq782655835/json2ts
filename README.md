@@ -10,7 +10,7 @@ npm install json2ts-core --save-dev
 ```
 
 ## Usage(CLI)
-you can generate a complete api site，like [NEI](https://nei.netease.com/)(default); or your single url address。
+you can generate multiple ts definition files for api site，like [NEI](https://nei.netease.com/)(default). or generate single file for your single url address.
 
 ```
 json2ts -u=your-web-url
@@ -26,15 +26,15 @@ json2ts -u=your-web-url
 ```
 
 ## Usage(API)
-
+you can use api to parser user-defined rule.
 ``` js
 const json2ts = require('json2ts-core/src/json2ts')
 
 json2ts({url: 'http://localhost:8002'}, ($) => {
-  // url from page to generate ts
-  // save method and url for each item
+  // your rule to parser page
   $('selector').each(function(index, element) {
     ...
+    arr.push({ url, method })
   })
   return arr
 })
