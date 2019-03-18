@@ -1,4 +1,4 @@
-# Json2ts
+# json2ts
 
 Automatically generate typescript definition file from url
 
