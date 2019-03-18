@@ -1,7 +1,8 @@
 # Json2ts
 
-Automatically generate Typescript Definition file from url
+Automatically generate typescript definition file from url
 
+![](https://github.com/lq782655835/json2ts/blob/master/json2ts.gif)
 ## Install
 
 ``` bash
@@ -9,6 +10,7 @@ npm install json2ts-core --save-dev
 ```
 
 ## Usage(CLI)
+you can generate a complete api site，like [NEI](https://nei.netease.com/)(default); or your single url address。
 
 ```
 json2ts -u=your-web-url
