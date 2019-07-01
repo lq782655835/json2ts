@@ -36,10 +36,11 @@ const convert = async (options, adapter) => {
         // 请求结果是nei页面，解析page
         logger.log('debug', { message: 'resolve page api', data: [mergeOptions] })
         let $ = cheerio.load(body)
-        let resolvePage = adapter || getAllUrl
+        let resolvePage = adapter || getAllUrl // 可自定义扩展resolve page
         let urls = resolvePage($)
 
-        exportInterfaces(mergeOptions, urls) // 批量导出
+        exportInterfaces(mergeOptions, urls) // 导出ts interface文件
+        exportServerAPI(urls) // 导出api模板文件
     }
 }
 
@@ -95,6 +96,36 @@ const exportTSFile = async (options, json, url) => {
 
     await fs.outputFile(outPath, outString)
     logger.log('info', { message: `ts interface success write。path: ${outPath}` })
+}
+
+const exportServerAPI = async urls => {
+    const getServiceNameByRule = (url, method) => {
+        let title = getInterfaceTitle(url)
+        let upperCaseArr = title.split('-').map(str =>
+            str.replace(/^\S/, function(s) {
+                return s.toUpperCase()
+            })
+        )
+        return method.toLowerCase() + upperCaseArr.join('')
+    }
+
+    let prefix = [`import http from '../http'`]
+    let resultString = prefix
+        .concat(
+            urls.map(({ url, method }) => {
+                return `export const ${getServiceNameByRule(url, method)} = data =>
+    http({
+        url: \`${url}\`,
+        method: \`${method}\`,
+        data
+    })`
+            })
+        )
+        .join('\n\n')
+
+    let outPath = './serverAPI.ts'
+    await fs.outputFile(outPath, resultString)
+    logger.log('info', { message: `ts server api success write。path: ${outPath}` })
 }
 
 module.exports = convert
