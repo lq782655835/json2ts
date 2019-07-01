@@ -8,7 +8,7 @@
   "main": "index.js",
   "scripts": {
     "github": "sh deploy.sh",
-    "dev": "node ./index.js --url=http://localhost:8002/view/jobs",
+    "dev": "node ./index.js --url=http://localhost:8002",
     "test": "jest",
     "format": "prettier --write \"./src/**/*.{js,ts,vue,json}\""
   },

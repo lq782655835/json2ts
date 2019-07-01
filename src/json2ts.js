@@ -2,41 +2,44 @@ const path = require('path')
 const fs = require('fs-extra')
 const rp = require('request-promise')
 const cheerio = require('cheerio')
+const json2ts = require('json2ts')
+
 const logger = require('./util/logger')
-const exportTSFile = require('./export-tsfile')
 const getInterfaceTitle = require('../src/util/helper').getInterfaceTitle
 
+const defaults = {
+    url: '',
+    method: 'get',
+    target: './interfaces',
+    property: ''
+}
+
 const convert = async (options, adapter) => {
-    let defaults = {
-        url: '',
-        method: 'get',
-        target: './interfaces',
-        property: ''
-    }
-    options = { ...defaults, ...options }
     if (!options.url) {
         logger.log('error', { message: 'url can not be empty' })
         return
     }
+    let mergeOptions = { ...defaults, ...options }
+    let { url, method, target } = mergeOptions
 
-    let { url, method, target, property } = options
-    url = url.endsWith('/') ? url.substring(0, url.length - 1) : url
-    target = path.join(process.cwd(), target)
+    // 参数设置
+    if (url.endsWith('/')) url = url.substring(0, url.length - 1)
+    if (!path.isAbsolute) target = path.join(process.cwd(), target)
 
+    // 请求url
     let body = await rp({ url, method, json: true })
     if (typeof body === 'object') {
-        logger.log('debug', { message: 'single api', data: [{ target, property, url }] })
-        exportTSFile(target, body, property, getInterfaceTitle(url))
+        // 请求结果是接口，直接导出
+        logger.log('debug', { message: 'single api', data: [mergeOptions] })
+        exportTSFile(mergeOptions, body, url)
     } else {
-        logger.log('debug', { message: 'resolve page api', data: [{ target, property, url }] })
-        // reslove page, get url and method
+        // 请求结果是nei页面，解析page
+        logger.log('debug', { message: 'resolve page api', data: [mergeOptions] })
         let $ = cheerio.load(body)
         let resolvePage = adapter || getAllUrl
         let urls = resolvePage($)
 
-        // get all urls response
-        let jsons = await getAllResponseJson(url, urls)
-        exportInterfaces(target, jsons, urls, property)
+        exportInterfaces(mergeOptions, urls) // 批量导出
     }
 }
 
@@ -55,6 +58,16 @@ const getAllUrl = $ => {
     return urlArr
 }
 
+const exportInterfaces = async (options, urls) => {
+    let { target, url } = options
+    // remove entire target folder
+    fs.removeSync(target)
+    logger.log('debug', { message: `remove target folder: ${target}` })
+
+    let jsons = await getAllResponseJson(url, urls)
+    jsons.forEach((json, index) => exportTSFile(options, json, urls[index].url))
+}
+
 const getAllResponseJson = async (root, urls) => {
     let promises = urls.map(
         async item =>
@@ -68,13 +81,20 @@ const getAllResponseJson = async (root, urls) => {
     return await Promise.all(promises)
 }
 
-const exportInterfaces = (target, jsons, urls, property) => {
-    // remove entire target folder
-    fs.removeSync(target)
-    logger.log('debug', { message: `remove target folder: ${target}` })
+const exportTSFile = async (options, json, url) => {
+    if (!json) return
 
-    jsons.forEach((json, index) =>
-        exportTSFile(target, json, property, getInterfaceTitle(urls[index].url))
-    )
+    // export数据
+    let { target, property } = options
+    if (property) json = json[property] || ''
+    let outString = json2ts.convert(JSON.stringify(json))
+
+    // export路径
+    let title = getInterfaceTitle(url)
+    let outPath = path.join(target, title + '.ts')
+
+    await fs.outputFile(outPath, outString)
+    logger.log('info', { message: `ts interface success write。path: ${outPath}` })
 }
+
 module.exports = convert
