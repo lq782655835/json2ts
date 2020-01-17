@@ -24,7 +24,7 @@ const convert = async (options, adapter) => {
 
     // 参数设置
     if (url.endsWith('/')) url = url.substring(0, url.length - 1)
-    if (!path.isAbsolute) target = path.join(process.cwd(), target)
+    if (!path.isAbsolute(target)) target = path.join(process.cwd(), target)
 
     // 请求url
     let body = await rp({ url, method, json: true })
